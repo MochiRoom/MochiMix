@@ -112,6 +112,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxWidth()
                             .wrapContentWidth(Alignment.End)
                             .size(64.dp)
+                            .padding(8.dp)
                     )
                 }
             }
