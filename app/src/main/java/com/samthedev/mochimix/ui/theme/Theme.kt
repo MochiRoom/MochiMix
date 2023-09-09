@@ -34,29 +34,6 @@ private val LightColorScheme = lightColorScheme(
     onTertiary = Color.White,
     onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
-
-    primary = tonalPalette.primary80,
-        onPrimary = tonalPalette.primary20,
-        primaryContainer = tonalPalette.primary30,
-        onPrimaryContainer = tonalPalette.primary90,
-        inversePrimary = tonalPalette.primary40,
-        secondary = tonalPalette.secondary80,
-        onSecondary = tonalPalette.secondary20,
-        secondaryContainer = tonalPalette.secondary30,
-        onSecondaryContainer = tonalPalette.secondary90,
-        tertiary = tonalPalette.tertiary80,
-        onTertiary = tonalPalette.tertiary20,
-        tertiaryContainer = tonalPalette.tertiary30,
-        onTertiaryContainer = tonalPalette.tertiary90,
-        background = tonalPalette.neutral10,
-        onBackground = tonalPalette.neutral90,
-        surface = tonalPalette.neutral10,
-        onSurface = tonalPalette.neutral90,
-        surfaceVariant = tonalPalette.neutralVariant30,
-        onSurfaceVariant = tonalPalette.neutralVariant80,
-        inverseSurface = tonalPalette.neutral90,
-        inverseOnSurface = tonalPalette.neutral20,
-        outline = tonalPalette.neutralVariant60,
     */
 )
 
@@ -64,7 +41,7 @@ private val LightColorScheme = lightColorScheme(
 fun MochiMixTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = false,
+    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
