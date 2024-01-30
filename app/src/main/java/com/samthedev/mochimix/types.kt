@@ -7,6 +7,8 @@ data class Track(
     var name: String = "New Track",
     var author: String = "unknown",
 
+    var id: Int = 0,
+
     var cover: Painter? = null,
 )
 

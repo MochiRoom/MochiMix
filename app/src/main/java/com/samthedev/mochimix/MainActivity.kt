@@ -41,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -57,18 +58,40 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.samthedev.mochimix.ui.theme.MochiMixTheme
+import java.lang.reflect.Field
 
 class MainActivity : ComponentActivity() {
     private var playlist = SnapshotStateList<Playlist>()
     private var selected by mutableStateOf(-1)
 
-    var isPlaying by mutableStateOf(false)
+    private val musicPlayer = MusicPlayer(this@MainActivity)
 
     private lateinit var focusManager: FocusManager
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        playlist.add(Playlist("Default", "MochiMix"))
+        val rawClass = R.raw::class.java
+
+        // Get all fields (resource IDs) from the R.raw class
+        val rawFields: Array<Field> = rawClass.declaredFields
+
+        // Iterate through the fields
+        for (field in rawFields) {
+            try {
+                // Get the resource ID using reflection
+                val resourceId = field.getInt(null)
+
+                playlist[0].track.add(Track(name = field.name, id = resourceId))
+                // You can access the resource using the resourceId, for example:
+                // val inputStream = resources.openRawResource(resourceId)
+                // Do something with the inputStream
+            } catch (e: IllegalAccessException) {
+                e.printStackTrace()
+            }
+        }
 
         setContent {
             focusManager = LocalFocusManager.current
@@ -297,12 +320,8 @@ class MainActivity : ComponentActivity() {
 //                }
 
                 // Draw Cover Image
-                var cover = painterResource(R.drawable.toaster)
-                playlist.cover.let { it ->
-                    if (it != null) {
-                        cover = it
-                    }
-                }
+                val cover =
+                    if (playlist.cover != null) playlist.cover!! else painterResource(R.drawable.mochimix)
 
                 // TODO: move to edge, fade out left
                 Image(
@@ -452,7 +471,7 @@ class MainActivity : ComponentActivity() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 4.dp, bottom = 4.dp)
-                .clickable { isPlaying = true }
+                .clickable { musicPlayer.play(track.id) }
         ) {
             Box(Modifier.fillMaxSize()) {
                 // Draw Text
@@ -483,12 +502,8 @@ class MainActivity : ComponentActivity() {
 //                }
 
                 // Draw Cover Image
-                var cover = painterResource(R.drawable.toaster)
-                track.cover.let { it ->
-                    if (it != null) {
-                        cover = it
-                    }
-                }
+                val cover =
+                    if (track.cover != null) track.cover!! else painterResource(R.drawable.mochimix)
 
                 // TODO: move to edge, fade out left
                 Image(
@@ -506,7 +521,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun ControlBar() {
         IconButton(
-            onClick = { isPlaying = true },
+            onClick = { /* TODO */ },
             content = {
                 Icon(
                     painterResource(R.drawable.ic_arrow_left),
@@ -517,11 +532,18 @@ class MainActivity : ComponentActivity() {
             modifier = Modifier.size(80.dp)
         )
 
+        val isPlaying by rememberUpdatedState(newValue = musicPlayer.isPlaying())
+
         IconButton(
-            onClick = { isPlaying = !isPlaying },
+            onClick = {
+                if (musicPlayer.mMediaPlayer.isPlaying)
+                    musicPlayer.pause()
+                else
+                    musicPlayer.resume()
+            },
             content = {
                 Icon(
-                    painterResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play),
+                    painterResource(if (musicPlayer.mMediaPlayer.isPlaying) R.drawable.ic_pause else R.drawable.ic_play),
                     null,
                     Modifier.size(64.dp)
                 )
@@ -531,7 +553,7 @@ class MainActivity : ComponentActivity() {
             )
 
         IconButton(
-            onClick = { isPlaying = true },
+            onClick = { /* TODO */ },
             content = {
                 Icon(
                     painterResource(R.drawable.ic_arrow_right),
